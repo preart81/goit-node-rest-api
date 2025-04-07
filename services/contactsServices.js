@@ -1,59 +1,30 @@
-import { nanoid } from "nanoid";
-import fs from "node:fs/promises";
-import path from "path";
-
-// шлях до файлу contacts.json
-const contactsPath = path.resolve("db", "contacts.json");
+import Contact from "../db/models/Contact.js";
 
 /**
- * Оновлює файл contacts.json новим масивом контактів.
- *
- * @param {Array} contacts масив контактів
- * @returns {Promise<void>}
+ * Повертає масив контактів бази даних.
  */
-async function updateContacts(contacts) {
-    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-}
-
-/**
- * Повертає масив контактів.
- *
- * @returns {Promise<Array>} Масив контактів
- */
-async function listContacts() {
-    const data = await fs.readFile(contactsPath, "utf-8");
-    const contacts = JSON.parse(data);
-    return contacts;
-}
+const listContacts = async () => await Contact.findAll();
 
 /**
  * Повертає об'єкт контакту за ідентифікатором.
- *
- * @param {string} contactId ідентифікатор контакту
- * @returns {Promise<{}>} об'єкт контакту, якщо контакт з таким ідентифікатором існує, або null, якщо не існує
+ * @returns об'єкт контакту, якщо контакт з таким ідентифікатором існує, або null, якщо не існує
  */
-async function getContactById(contactId) {
-    const contacts = await listContacts();
-    const contact = contacts.find((contact) => contact.id === contactId);
-    return contact || null;
-}
+const getContactById = async (contactId) => await Contact.findByPk(contactId);
 
 /**
  * Видаляє контакт за ідентифікатором.
  *
  * @param {string} contactId ідентифікатор контакту
- * @returns {Promise<{}>} об'єкт видаленого контакту, якщо контакт з таким id існує, або null, якщо не існує
+ * @returns об'єкт видаленого контакту, якщо контакт з таким id існує, або null, якщо не існує
  */
-async function removeContact(contactId) {
-    const contacts = await listContacts();
-    const index = contacts.findIndex((contact) => contact.id === contactId);
-    if (index === -1) {
+const removeContact = async (contactId) => {
+    const deletedContact = await getContactById(contactId);
+    if (!deletedContact) {
         return null;
     }
-    const [deletedContact] = contacts.splice(index, 1);
-    await updateContacts(contacts);
+    await deletedContact.destroy();
     return deletedContact;
-}
+};
 
 /**
  * Додає новий контакт до списку контактів.
@@ -61,37 +32,46 @@ async function removeContact(contactId) {
  * @param {string} name Ім'я контакту
  * @param {string} email Email контакту
  * @param {string} phone Номер телефону контакту
+ * @param {boolean} favorite Вказує, чи є контакт улюбленим (за замовчуванням false)
  * @returns {Promise<Object>} Повертає об'єкт доданого контакту, що містить унікальний ідентифікатор
  */
-async function addContact(name, email, phone) {
-    const contacts = await listContacts();
-    const newContact = {
-        id: nanoid(),
+
+const addContact = async ({ name, email, phone, favorite = false }) => {
+    const newContact = await Contact.create({
         name,
         email,
         phone,
-    };
-    contacts.push(newContact);
-    await updateContacts(contacts);
+        favorite,
+    });
     return newContact;
-}
+};
 
 /**
  * Оновлює контакт за id.
  *
  * @param {string} contactId ідентифікатор контакту
  * @param {Object} data об'єкт з оновленими даними контакту
- * @returns {Promise<Object>} об'єкт оновленого контакту, якщо контакт з таким id існує, або null, якщо не існує
+ * @returns об'єкт оновленого контакту, якщо контакт з таким id існує, або null, якщо не існує
  */
-async function updateContact(contactId, data) {
-    const contacts = await listContacts();
-    const index = contacts.findIndex((contact) => contact.id === contactId);
-    if (index === -1) {
+const updateContact = async (contactId, data) => {
+    const contact = await getContactById(contactId);
+    if (!contact) {
         return null;
     }
-    contacts[index] = { ...contacts[index], ...data };
-    await updateContacts(contacts);
-    return contacts[index];
-}
+    return contact.update(data, { returning: true });
+};
 
-export default { listContacts, getContactById, removeContact, addContact, updateContact };
+const updateStatusContact = async (contactId, { favorite }) => {
+    const contact = await getContactById(contactId);
+    if (!contact) return null;
+    return contact.update({ favorite }, { returning: true });
+};
+
+export default {
+    listContacts,
+    getContactById,
+    removeContact,
+    addContact,
+    updateContact,
+    updateStatusContact,
+};

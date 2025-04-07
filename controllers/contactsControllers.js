@@ -30,8 +30,7 @@ export const deleteContact = ctrlWrapper(async (req, res) => {
 });
 
 export const createContact = ctrlWrapper(async (req, res) => {
-    const { name, email, phone } = req.body;
-    const newContact = await contactsService.addContact(name, email, phone);
+    const newContact = await contactsService.addContact(req.body);
 
     res.status(201).json(newContact);
 });
@@ -40,6 +39,17 @@ export const updateContact = ctrlWrapper(async (req, res) => {
     const { id } = req.params;
     const data = req.body;
     const updatedContact = await contactsService.updateContact(id, data);
+
+    if (!updatedContact) {
+        throw HttpError(404, `Contact with id=${id} not found`);
+    }
+    res.json(updatedContact);
+});
+
+export const updateStatusContact = ctrlWrapper(async (req, res) => {
+    const { id } = req.params;
+    const data = req.body;
+    const updatedContact = await contactsService.updateStatusContact(id, data);
 
     if (!updatedContact) {
         throw HttpError(404, `Contact with id=${id} not found`);
