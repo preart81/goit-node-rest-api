@@ -1,4 +1,4 @@
-import "dotenv/config";
+// import "dotenv/config";
 import { DataTypes } from "sequelize";
 import sequelize from "../Sequelize.js";
 
@@ -21,6 +21,6 @@ const User = sequelize.define("contact", {
     },
 });
 
-User.sync();
+// User.sync();
 
 export default User;
