@@ -23,6 +23,6 @@ const User = sequelize.define("user", {
 });
 
 // User.sync({ alter: true });
-User.sync({ force: true }) // Видалення та повторне створення таблиці
+// User.sync({ force: true }) // Видалення та повторне створення таблиці
 
 export default User;

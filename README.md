@@ -100,6 +100,68 @@
 -   **`sequelize`**:
     -   Використовується для роботи з базою даних PostgreSQL.
 
+## Структура проекту
+```
+goit-node-rest-api/
+├── controllers/
+│   └── contactsControllers.js   # Контролери для обробки запитів, пов'язаних із контактами.
+│   └── authControllers.js       # Контролери для обробки запитів, пов'язаних із авторизацією.
+├── db/
+│   ├── Sequelize.js             # Налаштування підключення до бази даних через Sequelize.
+│   └── models/
+│       └── Contact.js           # Модель для роботи з таблицею "contacts" у базі даних.
+├── helpers/
+│   ├── HttpError.js             # Утиліта для створення об'єктів помилок із статусами.
+│   ├── ctrlWrapper.js           # Обгортка для контролерів для автоматичної обробки помилок.
+│   └── validateBody.js          # Мідлвара для валідації `body` запитів.
+├── routes/
+│   ├── contactsRouter.js        # Маршрути для роботи з контактами.
+│   └── authRouter.js            # Маршрути для авторизації.
+├── schemas/
+│   └── contactsSchemas.js       # Joi-схеми для валідації даних контактів.
+├── services/
+│   └── contactsServices.js      # Логіка роботи з базою даних для контактів.
+├── .env                         # Конфігураційний файл із секретними змінними середовища.
+├── .env.example                 # Приклад файлу `.env` для налаштування середовища.
+├── app.js                       # Основний файл додатку, налаштування серверу.
+├── README.md                    # Документація проекту.
+└── package.json                 # Інформація про проект та залежності.
+```
+### Пояснення директорій:
+
+1. **[controllers](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)**:
+
+    - Містить функції-контролери, які обробляють HTTP-запити. Вони отримують дані з запиту, викликають відповідні сервіси та повертають відповіді клієнту.
+2. **[db](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)**:
+
+    - Містить налаштування бази даних (`Sequelize.js`) і моделі для роботи з таблицями бази даних (наприклад, `Contact.js`).
+3. **[helpers](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)**:
+
+    - Утиліти та мідлвари, які спрощують роботу з кодом:
+        - `HttpError.js`: створює помилки з відповідними статусами.
+        - `ctrlWrapper.js`: обгортає контролери для автоматичної обробки помилок.
+        - `validateBody.js`: перевіряє коректність даних у `body` запитів.
+4. **[routes](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)**:
+
+    - Містить маршрути для різних частин API:
+        - `contactsRouter.js`: маршрути для роботи з контактами.
+        - `authRouter.js`: маршрути для авторизації.
+5. **[schemas](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)**:
+
+    - Містить Joi-схеми для валідації даних, які надходять у запитах. Наприклад, [contactsSchemas.js](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html) перевіряє дані для створення, оновлення чи зміни статусу контактів.
+6. **[services](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)**:
+
+    - Містить бізнес-логіку для роботи з базою даних. Наприклад, `contactsServices.js` виконує запити до бази даних для отримання, створення, оновлення чи видалення контактів.
+7. **Кореневі файли**:
+
+    - [.env](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html): зберігає конфіденційні змінні середовища (наприклад, доступ до бази даних).
+    - [.env.example](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html): приклад файлу [.env](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html) для налаштування середовища.
+    - [app.js](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html): основний файл додатку, де налаштовується сервер, підключаються маршрути та мідлвари.
+    - [README.md](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html): документація проекту.
+    - [package.json](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html): опис проекту, залежності та скрипти для запуску.
+
+Ця структура дозволяє легко підтримувати, розширювати та тестувати проект.
+
 ## Запуск у режимі розробки
 
 Для зручної розробки можна використовувати `nodemon`:
