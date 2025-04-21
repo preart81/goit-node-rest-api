@@ -19,8 +19,13 @@ const Contact = sequelize.define("contact", {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
     },
+    owner: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
 });
 
-// Contact.sync();
+// Contact.sync( {alter: true} );
+// Contact.sync({ force: true }) // Видалення та повторне створення таблиці
 
 export default Contact;
