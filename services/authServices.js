@@ -56,3 +56,12 @@ export const loginUser = async (data) => {
         user,
     };
 };
+
+export const logoutUser = async (id) => {
+    const user = await User.findByPk(id);
+    if (!user || !user.token) {
+        throw HttpError(401, "Not authorized");
+    }
+
+    await user.update({ token: null });
+};

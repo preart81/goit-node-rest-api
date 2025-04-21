@@ -22,7 +22,7 @@ const authenticate = async (req, res, next) => {
 
   const user = await findUser({ email: payload.email });
     if (!user || !user.token) {
-        return next(HttpError(401, "User not found"));
+        return next(HttpError(401, "Not authorized"));
     }
 
     req.user = user;

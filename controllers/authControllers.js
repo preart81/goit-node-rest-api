@@ -22,7 +22,15 @@ const loginUserController = async (req, res) => {
     });
 };
 
+const logoutUserController = async (req, res) => {
+    const {id} = req.user;
+    await authServices.logoutUser(id);
+    
+    res.status(204).send();
+};
+
 export default {
     registerUserController: ctrlWrapper(registerUserController),
     loginUserController: ctrlWrapper(loginUserController),
+    logoutUserController: ctrlWrapper(logoutUserController),
 };
