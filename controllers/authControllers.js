@@ -1,5 +1,5 @@
 import ctrlWrapper from "../helpers/ctrlWrapper.js";
-import * as  authServices from "../services/authServices.js";
+import * as authServices from "../services/authServices.js";
 
 const registerUserController = async (req, res) => {
     const NewUser = await authServices.registerUser(req.body);
@@ -12,9 +12,13 @@ const registerUserController = async (req, res) => {
     });
 };
 const loginUserController = async (req, res) => {
-    const { token } = await authServices.loginUser(req.body);
+    const { token, user } = await authServices.loginUser(req.body);
     res.status(200).json({
         token,
+        user: {
+            email: user.email,
+            subscription: user.subscription,
+        },
     });
 };
 

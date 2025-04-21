@@ -4,8 +4,11 @@ import jwt from "jsonwebtoken";
 import User from "../db/models/User.js";
 
 import HttpError from "../helpers/HttpError.js";
+import { generateToken } from "../helpers/jwt.js";
 
 const { JWT_SECRET } = process.env;
+
+export const findUser = (query) => User.findOne({ where: query });
 
 export const registerUser = async (data) => {
     const { email, password } = data;
@@ -45,11 +48,11 @@ export const loginUser = async (data) => {
         email,
     };
 
-    const token = jwt.sign(payload, JWT_SECRET, {
-        expiresIn: "24h",
-    });
+    const token = generateToken(payload);
+    await user.update({ token });
 
     return {
         token,
+        user,
     };
 };
