@@ -3,13 +3,13 @@ import Contact from "../db/models/Contact.js";
 /**
  * Повертає масив контактів бази даних.
  */
-const listContacts = async () => await Contact.findAll();
+const listContacts = async (query) => await Contact.findAll({ where: query });
 
 /**
  * Повертає об'єкт контакту за ідентифікатором.
  * @returns об'єкт контакту, якщо контакт з таким ідентифікатором існує, або null, якщо не існує
  */
-const getContactById = async (contactId) => await Contact.findByPk(contactId);
+const getContactById = async (query) => await Contact.findOne({ where: query });
 
 /**
  * Видаляє контакт за ідентифікатором.
@@ -17,12 +17,12 @@ const getContactById = async (contactId) => await Contact.findByPk(contactId);
  * @param {string} contactId ідентифікатор контакту
  * @returns об'єкт видаленого контакту, якщо контакт з таким id існує, або null, якщо не існує
  */
-const removeContact = async (contactId) => {
-    const deletedContact = await getContactById(contactId);
+const removeContact = async (query) => {
+    const deletedContact = await getContactById(query);
     if (!deletedContact) {
         return null;
     }
-    await deletedContact.destroy();
+    await deletedContact.destroy({ where: query });
     return deletedContact;
 };
 
@@ -36,13 +36,8 @@ const removeContact = async (contactId) => {
  * @returns {Promise<Object>} Повертає об'єкт доданого контакту, що містить унікальний ідентифікатор
  */
 
-const addContact = async ({ name, email, phone, favorite = false }) => {
-    const newContact = await Contact.create({
-        name,
-        email,
-        phone,
-        favorite,
-    });
+const addContact = async (data) => {
+    const newContact = await Contact.create(data);
     return newContact;
 };
 
@@ -53,16 +48,16 @@ const addContact = async ({ name, email, phone, favorite = false }) => {
  * @param {Object} data об'єкт з оновленими даними контакту
  * @returns об'єкт оновленого контакту, якщо контакт з таким id існує, або null, якщо не існує
  */
-const updateContact = async (contactId, data) => {
-    const contact = await getContactById(contactId);
+const updateContact = async (query, data) => {
+    const contact = await getContactById(query);
     if (!contact) {
         return null;
     }
     return contact.update(data, { returning: true });
 };
 
-const updateStatusContact = async (contactId, { favorite }) => {
-    const contact = await getContactById(contactId);
+const updateStatusContact = async (query, { favorite }) => {
+    const contact = await getContactById(query);
     if (!contact) return null;
     return contact.update({ favorite }, { returning: true });
 };
