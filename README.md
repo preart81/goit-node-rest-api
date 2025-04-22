@@ -25,52 +25,227 @@
 
 ## Доступні маршрути
 
-### Отримання всіх контактів
+### Авторизація
+
+#### Реєстрація користувача
+
+**POST /api/auth/register**
+
+-   Отримує `body` у форматі JSON з обов'язковими полями `{email, password}`.
+-   Виконує валідацію за допомогою мідлвари `validateBody.js`.  
+    **Registration request**
+
+    ```json
+    POST /api/auth/register
+    Content-Type: application/json
+    RequestBody: {
+      "email": "example@example.com",
+      "password": "examplepassword"
+    }
+    ```
+
+    **Registration validation error**
+
+    ```json
+    Status: 400 Bad Request
+    Content-Type: application/json
+    ResponseBody: {
+    "message": "Помилка від Joi або іншої бібліотеки валідації"
+    }
+    ```
+
+    **Registration conflict error**
+
+    ```json
+    Status: 409 Conflict
+    Content-Type: application/json
+    ResponseBody: {
+    "message": "Email in use"
+    }
+    ```
+
+    **Registration success response**
+
+    ```json
+    Status: 201 Created
+    Content-Type: application/json
+    ResponseBody: {
+    "user": {
+        "email": "example@example.com",
+        "subscription": "starter"
+    }
+    }
+    ```
+
+#### Логін користувача
+
+**POST /api/auth/login**
+
+-   Отримує `body` у форматі JSON з обов'язковими полями `{email, password}`.
+-   Виконує валідацію за допомогою мідлвари `validateBody.js`.
+
+    **Login request**
+
+    ```json
+    POST /api/auth/login
+    Content-Type: application/json
+    RequestBody: {
+    "email": "example@example.com",
+    "password": "examplepassword"
+    }
+    ```
+
+    **Login validation error**
+
+    ```json
+    Status: 400 Bad Request
+    Content-Type: application/json
+    ResponseBody: {
+    "message": "Помилка від Joi або іншої бібліотеки валідації"
+    }
+    ```
+
+    **Login success response**
+
+    ```json
+    Status: 200 OK
+    Content-Type: application/json
+    ResponseBody: {
+    "token": "exampletoken",
+    "user": {
+        "email": "example@example.com",
+        "subscription": "starter"
+    }
+    }
+    ```
+
+    **Login auth error**
+
+    ```json
+    Status: 401 Unauthorized
+    ResponseBody: {
+    "message": "Email or password is wrong"
+    }
+    ```
+
+#### Отримання поточного користувача
+
+**GET /api/auth/current**
+
+-   Вимагає токен авторизації в заголовку `Authorization: Bearer <token>`.
+
+    **Current user request**
+
+    ```json
+    GET /api/auth/current
+    Authorization: "Bearer {{token}}"
+    ```
+
+    **Current user unauthorized error**
+
+    ```json
+    Status: 401 Unauthorized
+    Content-Type: application/json
+    ResponseBody: {
+    "message": "Not authorized"
+    }
+    ```
+
+    **Current user success response**
+
+    ```json
+    Status: 200 OK
+    Content-Type: application/json
+    ResponseBody: {
+    "email": "example@example.com",
+    "subscription": "starter"
+    }
+    ```
+
+#### Логаут користувача
+
+**POST /api/auth/logout**
+
+-   Вимагає токен авторизації в заголовку `Authorization: Bearer <token>`.
+    
+    **Logout request**
+
+    ```json
+    POST /api/auth/logout
+    Authorization: "Bearer {{token}}"
+    ```
+
+    **Logout unauthorized error**
+
+    ```json
+    Status: 401 Unauthorized
+    Content-Type: application/json
+    ResponseBody: {
+    "message": "Not authorized"
+    }
+    ```
+
+    **Logout success response**
+
+    ```json
+    Status: 204 No Content
+    ```
+
+---
+
+### Контакти
+
+#### Отримання всіх контактів
 
 **GET /api/contacts**
 
--   Повертає масив усіх контактів у форматі JSON зі статусом `200`.
+-   Вимагає токен авторизації.
+-   Повертає масив усіх контактів поточного користувача у форматі JSON зі статусом `200`.
 
-### Отримання контакту за ID
+#### Отримання контакту за ID
 
 **GET /api/contacts/:id**
 
+-   Вимагає токен авторизації.
 -   Якщо контакт знайдено – повертає об'єкт контакту у форматі JSON зі статусом `200`.
 -   Якщо контакт не знайдено – повертає JSON `{ "message": "Contact with id=<id> not found" }` зі статусом `404`.
 
-### Видалення контакту
+#### Видалення контакту
 
 **DELETE /api/contacts/:id**
 
+-   Вимагає токен авторизації.
 -   Якщо контакт знайдено та видалено – повертає об'єкт видаленого контакту у форматі JSON зі статусом `200`.
 -   Якщо контакт не знайдено – повертає JSON `{ "message": "Contact with id=<id> not found" }` зі статусом `404`.
 
-### Додавання нового контакту
+#### Додавання нового контакту
 
 **POST /api/contacts**
 
+-   Вимагає токен авторизації.
 -   Отримує `body` у форматі JSON з обов'язковими полями `{name, email, phone}`.
--   Виконує валідацію за допомогою мідлвари `validateBody.js`, яка перевіряє коректність даних.
+-   Виконує валідацію за допомогою мідлвари `validateBody.js`.
 -   Якщо `body` некоректний – повертає JSON `{ "message": error.message }` зі статусом `400`.
--   Якщо `body` валідний – додає контакт і повертає новий об'єкт `{id, name, email, phone}` зі статусом `201`.
+-   Якщо контакт успішно створено – повертає новий об'єкт контакту зі статусом `201`.
 
-### Оновлення контакту
+#### Оновлення контакту
 
 **PUT /api/contacts/:id**
 
+-   Вимагає токен авторизації.
 -   Отримує `body` у форматі JSON із можливістю оновлення будь-яких полів (`name`, `email`, `phone`, `favorite`).
 -   Якщо `body` порожній – повертає JSON `{ "message": "Body must have at least one field" }` зі статусом `400`.
--   Виконує валідацію за допомогою мідлвари `validateBody.js`, яка перевіряє коректність даних.
--   Якщо `body` некоректний – повертає JSON `{ "message": error.message }` зі статусом `400`.
+-   Виконує валідацію за допомогою мідлвари `validateBody.js`.
 -   Якщо контакт знайдено – оновлює його і повертає оновлений об'єкт зі статусом `200`.
 -   Якщо контакт не знайдено – повертає JSON `{ "message": "Contact with id=<id> not found" }` зі статусом `404`.
 
-### Оновлення статусу контакту
+#### Оновлення статусу контакту
 
 **PATCH /api/contacts/:id/favorite**
 
+-   Вимагає токен авторизації.
 -   Отримує `body` у форматі JSON з обов'язковим полем `{favorite}`.
--   Виконує валідацію за допомогою мідлвари `validateBody.js`, яка перевіряє коректність даних.
+-   Виконує валідацію за допомогою мідлвари `validateBody.js`.
 -   Якщо `body` некоректний – повертає JSON `{ "message": error.message }` зі статусом `400`.
 -   Якщо контакт знайдено – оновлює його статус і повертає оновлений об'єкт зі статусом `200`.
 -   Якщо контакт не знайдено – повертає JSON `{ "message": "Contact with id=<id> not found" }` зі статусом `404`.
@@ -101,11 +276,12 @@
     -   Використовується для роботи з базою даних PostgreSQL.
 
 ## Структура проекту
+
 ```
 goit-node-rest-api/
 ├── controllers/
-│   └── contactsControllers.js   # Контролери для обробки запитів, пов'язаних із контактами.
-│   └── authControllers.js       # Контролери для обробки запитів, пов'язаних із авторизацією.
+│   ├── contactsControllers.js   # Контролери для обробки запитів, пов'язаних із контактами.
+│   ├── authControllers.js       # Контролери для обробки запитів, пов'язаних із авторизацією.
 ├── db/
 │   ├── Sequelize.js             # Налаштування підключення до бази даних через Sequelize.
 │   └── models/
@@ -114,11 +290,14 @@ goit-node-rest-api/
 │   ├── HttpError.js             # Утиліта для створення об'єктів помилок із статусами.
 │   ├── ctrlWrapper.js           # Обгортка для контролерів для автоматичної обробки помилок.
 │   └── validateBody.js          # Мідлвара для валідації `body` запитів.
+├── middlewares/
+│   └── authenticate.js          # Мідлвара для перевірки автентифікації користувача.
 ├── routes/
 │   ├── contactsRouter.js        # Маршрути для роботи з контактами.
 │   └── authRouter.js            # Маршрути для авторизації.
 ├── schemas/
-│   └── contactsSchemas.js       # Joi-схеми для валідації даних контактів.
+│   ├── contactsSchemas.js       # Joi-схеми для валідації даних контактів.
+│   └── authSchemas.js           # Joi-схеми для валідації даних авторизації.
 ├── services/
 │   └── contactsServices.js      # Логіка роботи з базою даних для контактів.
 ├── .env                         # Конфігураційний файл із секретними змінними середовища.
@@ -127,38 +306,52 @@ goit-node-rest-api/
 ├── README.md                    # Документація проекту.
 └── package.json                 # Інформація про проект та залежності.
 ```
+
 ### Пояснення директорій:
 
-1. **[controllers](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)**:
+1. **`controllers/`**:
 
     - Містить функції-контролери, які обробляють HTTP-запити. Вони отримують дані з запиту, викликають відповідні сервіси та повертають відповіді клієнту.
-2. **[db](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)**:
+
+2. **`db/`**:
 
     - Містить налаштування бази даних (`Sequelize.js`) і моделі для роботи з таблицями бази даних (наприклад, `Contact.js`).
-3. **[helpers](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)**:
+
+3. **`helpers/`**:
 
     - Утиліти та мідлвари, які спрощують роботу з кодом:
         - `HttpError.js`: створює помилки з відповідними статусами.
         - `ctrlWrapper.js`: обгортає контролери для автоматичної обробки помилок.
         - `validateBody.js`: перевіряє коректність даних у `body` запитів.
-4. **[routes](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)**:
+
+4. **`middlewares/`**:
+
+    - Містить мідлвари для обробки запитів:
+        - `authenticate.js`: перевіряє автентифікацію користувача.
+
+5. **`routes/`**:
 
     - Містить маршрути для різних частин API:
         - `contactsRouter.js`: маршрути для роботи з контактами.
         - `authRouter.js`: маршрути для авторизації.
-5. **[schemas](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)**:
 
-    - Містить Joi-схеми для валідації даних, які надходять у запитах. Наприклад, [contactsSchemas.js](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html) перевіряє дані для створення, оновлення чи зміни статусу контактів.
-6. **[services](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)**:
+6. **`schemas/`**:
 
-    - Містить бізнес-логіку для роботи з базою даних. Наприклад, `contactsServices.js` виконує запити до бази даних для отримання, створення, оновлення чи видалення контактів.
-7. **Кореневі файли**:
+    - Містить Joi-схеми для валідації даних, які надходять у запитах:
+        - `contactsSchemas.js`: перевіряє дані для створення, оновлення чи зміни статусу контактів.
+        - `authSchemas.js`: перевіряє дані для реєстрації та входу користувачів.
 
-    - [.env](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html): зберігає конфіденційні змінні середовища (наприклад, доступ до бази даних).
-    - [.env.example](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html): приклад файлу [.env](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html) для налаштування середовища.
-    - [app.js](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html): основний файл додатку, де налаштовується сервер, підключаються маршрути та мідлвари.
-    - [README.md](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html): документація проекту.
-    - [package.json](vscode-file://vscode-app/c:/Users/preart/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html): опис проекту, залежності та скрипти для запуску.
+7. **`services/`**:
+
+    - Містить бізнес-логіку для роботи з базою даних:
+        - `contactsServices.js`: виконує запити до бази даних для отримання, створення, оновлення чи видалення контактів.
+
+8. **Кореневі файли**:
+    - `.env`: зберігає конфіденційні змінні середовища (наприклад, доступ до бази даних).
+    - `.env.example`: приклад файлу `.env` для налаштування середовища.
+    - `app.js`: основний файл додатку, де налаштовується сервер, підключаються маршрути та мідлвари.
+    - `README.md`: документація проекту.
+    - `package.json`: опис проекту, залежності та скрипти для запуску.
 
 Ця структура дозволяє легко підтримувати, розширювати та тестувати проект.
 
