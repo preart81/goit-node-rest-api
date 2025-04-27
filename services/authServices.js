@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 import User from "../db/models/User.js";
 
+import gravatar from "gravatar";
 import HttpError from "../helpers/HttpError.js";
 import { generateToken } from "../helpers/jwt.js";
 
@@ -23,8 +24,14 @@ export const registerUser = async (data) => {
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
+    const avatarURL = gravatar.url(email, {
+        s: "250", // розмір
+        r: "g", // рейтинг
+        d: "identicon", // тип дефолтного зображення
+        protocol: "https",
+    });
 
-    return User.create({ ...data, password: hashPassword });
+    return User.create({ ...data, password: hashPassword, avatarURL });
 };
 
 export const loginUser = async (data) => {
