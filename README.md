@@ -77,6 +77,56 @@
     }
     ```
 
+#### Верифікація email
+
+**GET /api/auth/verify/:verificationCode**
+
+-   Отримує код верифікації як параметр URL
+-   Виконує верифікацію email користувача
+
+    **Verification request**
+
+    ```json
+    GET /api/auth/verify/verification-code-here
+    ```
+
+    **Verification success response**
+
+    ```json
+    Status: 200 OK
+    Content-Type: application/json
+    ResponseBody: {
+        "message": "Verification successful"
+    }
+    ```
+
+#### Повторна відправка листа верифікації
+
+**POST /api/auth/verify**
+
+-   Отримує `body` у форматі JSON з обов'язковим полем `email`
+-   Відправляє новий лист з кодом верифікації
+
+    **Resend verification request**
+
+    ```json
+    POST /api/auth/verify
+    Content-Type: application/json
+    RequestBody: {
+        "email": "example@example.com"
+    }
+    ```
+
+    **Resend verification success response**
+
+    ```json
+    Status: 200 OK
+    Content-Type: application/json
+    ResponseBody: {
+        "message": "Verify email resend"
+    }
+    ```
+
 #### Логін користувача
 
 **POST /api/auth/login**
@@ -162,12 +212,51 @@
     }
     ```
 
+#### Оновлення аватарки користувача
+
+**PATCH /api/auth/avatars**
+
+-   Вимагає токен авторизації.
+-   Отримує файл аватарки через `multipart/form-data`.
+-   Підтримує формати: JPG, PNG, GIF.
+
+    **Update avatar request**
+
+    ```json
+    PATCH /api/auth/avatars
+    Authorization: "Bearer {{token}}"
+    Content-Type: multipart/form-data
+    Body: form-data
+    Key: avatar
+    Value: [файл]
+    ```
+
+    **Update avatar validation error**
+
+    ```json
+    Status: 400 Bad Request
+    Content-Type: application/json
+    ResponseBody: {
+        "message": "Аватар не завантажено"
+    }
+    ```
+
+    **Update avatar success response**
+
+    ```json
+    Status: 200 OK
+    Content-Type: application/json
+    ResponseBody: {
+        "avatarURL": "avatars/filename.jpg"
+    }
+    ```
+
 #### Логаут користувача
 
 **POST /api/auth/logout**
 
 -   Вимагає токен авторизації в заголовку `Authorization: Bearer <token>`.
-    
+
     **Logout request**
 
     ```json

@@ -17,6 +17,25 @@ const registerUserController = async (req, res) => {
         },
     });
 };
+
+const verifyController = async (req, res) => {
+    const { verificationCode } = req.params;
+    await authServices.verifyUser(verificationCode);
+
+    res.status(200).json({
+        message: "Verification successful",
+    });
+};
+
+const resendVerifyEmailController = async (req, res) => {
+    const { email } = req.body;
+    await authServices.resendVerifyEmail(email);
+
+    res.json({
+        message: "Verification email sent",
+    });
+};
+
 const loginUserController = async (req, res) => {
     const { token, user } = await authServices.loginUser(req.body);
     res.status(200).json({
@@ -75,4 +94,6 @@ export default {
     getCurrentUserController: ctrlWrapper(getCurrentUserController),
     updateAvatarUserController: ctrlWrapper(updateAvatarUserController),
     logoutUserController: ctrlWrapper(logoutUserController),
+    verifyController: ctrlWrapper(verifyController),
+    resendVerifyEmailController: ctrlWrapper(resendVerifyEmailController),
 };

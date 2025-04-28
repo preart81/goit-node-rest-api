@@ -11,6 +11,14 @@ const User = sequelize.define("user", {
         allowNull: false,
         unique: true,
     },
+    verify: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    },
+    verificationCode: {
+        type: DataTypes.STRING,
+        unique: true,
+    },
     subscription: {
         type: DataTypes.ENUM,
         values: ["starter", "pro", "business"],
