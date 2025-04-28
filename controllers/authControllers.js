@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import ctrlWrapper from "../helpers/ctrlWrapper.js";
+import HttpError from "../helpers/HttpError.js";
 import * as authServices from "../services/authServices.js";
 
 const avatarsDir = path.join(process.cwd(), "public", "avatars");
